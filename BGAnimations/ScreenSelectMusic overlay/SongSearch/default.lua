@@ -33,12 +33,35 @@ local af = Def.ActorFrame {
 		end
 		self:visible(false)
 	end,
+	PerformSearchMessageCommand=function(self, params)
+		local candidates = SONGMAN:GetAllSongs()
+		local stepsType = GAMESTATE:GetCurrentStyle():GetStepsType()
+
+		-- Only add valid candidates if there are steps in the current mode.
+		FilterTable(candidates, function(song) return song:HasStepsType(stepsType) end)
+
+		if params.query then
+			FilterTable(candidates, function(song)
+				return (song:GetDisplayFullTitle():lower():find(params.query:lower()) ~= nil or
+						song:GetTranslitFullTitle():lower():find(params.query:lower()) ~= nil)
+			end)
+		end
+		MESSAGEMAN:Broadcast("DisplaySearchResults", {searchText=params.query, candidates=candidates})
+	end,
+
 	-- slightly darken the entire screen
 	Def.Quad {
 		InitCommand=function(self)
 			self:FullScreen():diffuse(Color.Black):diffusealpha(0.8)
 		end
 	},
+
+	LoadActor("SearchInput.lua")..{
+		Name="SearchInput",
+		InitCommand=function(self)
+			self:visible(false)
+		end
+	}
 }
 
 local overlay = Def.ActorFrame {
