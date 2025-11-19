@@ -458,9 +458,9 @@ local t = Def.ActorFrame {
 	DirectInputToEngineForSongSearchCommand=function(self)
 		DirectInputToEngine(self)
 
-		-- Then add the ScreenTextEntry on top.
-		-- SCREENMAN:AddNewScreenToTop("ScreenTextEntry")
-		-- SCREENMAN:GetTopScreen():Load(SongSearchSettings)
+		local searchInput = self:GetParent():GetChild("SongSearch"):GetChild("SearchInput")
+		searchInput:visible(true)
+		SCREENMAN:GetTopScreen():AddInputCallback(LoadActor("../SongSearch/SearchInputHandler.lua"))
 	end,
 	DirectInputToEngineForSelectProfileCommand=function(self)
 		DirectInputToEngine(self)
