@@ -1,4 +1,5 @@
 local player = ...
+local pn = ToEnumShortString(player)
 
 local _x = _screen.cx + (player==PLAYER_1 and -1 or 1) * SL_WideScale(292.5, 342.5)
 local _y = 56
