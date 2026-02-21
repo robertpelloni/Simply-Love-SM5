@@ -11,7 +11,7 @@ local PlayerDefaults = {
 				HoldJudgment = "Love 1x2 (doubleres).png",
 				NoteSkin = nil,
 				Mini = "0%",
-				BackgroundFilter = "Off",
+				BackgroundFilter = "Darker",
 				VisualDelay = "0ms",
 
 				HideTargets = false,
@@ -25,10 +25,11 @@ local PlayerDefaults = {
 				ColumnFlashOnMiss = false,
 				SubtractiveScoring = false,
 				MeasureCounter = "None",
-				MeasureCounterLeft = true,
-				MeasureCounterUp = false,
+				MeasureCounterLeft = false,
+				MeasureCounterUp = true,
+				HideLookahead = false,
 				MeasureLines = "Off",
-				DataVisualizations = "None",
+				DataVisualizations = "Step Statistics",
 				TargetScore = 11,
 				ActionOnMissedTarget = "Nothing",
 				Pacemaker = false,
@@ -36,7 +37,7 @@ local PlayerDefaults = {
 				NPSGraphAtTop = false,
 				JudgmentTilt = false,
 				TiltMultiplier = 1,
-				ColumnCues = false,
+				ColumnCues = true,
 				DisplayScorebox = true,
 
 				ErrorBar = "None",
@@ -47,6 +48,8 @@ local PlayerDefaults = {
 				HideEarlyDecentWayOffJudgments = false,
 				HideEarlyDecentWayOffFlash = false,
 
+				-- While SL no longer supports disabling individual timing windows
+				-- in ITG mode, Casual mode still does so we still track it here.
 				TimingWindows = {true, true, true, true, true},
 				ShowFaPlusWindow = false,
 				ShowExScore = false,
@@ -149,11 +152,15 @@ local GlobalDefaults = {
 			self.GameplayReloadCheck = false
 			-- How long to wait before displaying a "cue"
 			self.ColumnCueMinTime = 1.5
+
+			-- TODO(teejusb): We should only initialize this once to save on compute.
+			self.GrooveStatsPlayerOptionKeys = CreateGrooveStatsPlayerOptionKeys()
 		end,
 
 		-- These values outside initialize() won't be reset each game cycle,
 		-- but are rather manipulated as needed by the theme.
 		ActiveColorIndex = ThemePrefs.Get("SimplyLoveColor") or 1,
+		FastProfileSwitch = false,
 	}
 }
 
@@ -218,6 +225,15 @@ SL = {
 			color("#ffffff"),	-- white
 			color("#e29c18"),	-- gold
 			color("#66c955"),	-- green
+			color("#b45cff"),	-- purple (greatly lightened)
+			color("#ff3030")	-- red (slightly lightened)
+		},
+		DDR = {
+			color("#faf6d1"),	-- white
+			color("#e29c18"),	-- gold
+			color("#66c955"),	-- green
+			color("#21CCE8"),	-- blue
+			-- Colors below are basically unused.
 			color("#b45cff"),	-- purple (greatly lightened)
 			color("#ff3030")	-- red (slightly lightened)
 		},
@@ -293,6 +309,28 @@ SL = {
 			TimingWindowSecondsMine=0.070000,
 			TimingWindowSecondsRoll=0.350000,
 		},
+		DDR = {
+			TimingWindowAdd=0.0000,
+			RegenComboAfterMiss=0,
+			MaxRegenComboAfterMiss=0,
+			MinTNSToHideNotes="TapNoteScore_W4",
+			HarshHotLifePenalty=true,
+
+			PercentageScoring=true,
+			AllowW1="AllowW1_Everywhere",
+			SubSortByNumSteps=true,
+
+			TimingWindowSecondsW1=0.016667, -- Marv
+			TimingWindowSecondsW2=0.033333, -- Perf
+			TimingWindowSecondsW3=0.083333, -- Great
+			TimingWindowSecondsW4=0.123333, -- Good
+			TimingWindowSecondsW5=0.163333, -- "Almost"
+			-- NOTE(teejusb): Not quite sure. Just stick with ITG for now.
+			TimingWindowSecondsHold=0.320000,
+			-- NOTE(teejusb): I believe shock arrows are the same as greats?
+			TimingWindowSecondsMine=0.083333,
+			TimingWindowSecondsRoll=0.350000,
+		},
 	},
 	Metrics = {
 		-- The PercentScoreWeightCheckpointHit and
@@ -313,7 +351,7 @@ SL = {
 			PercentScoreWeightW5=0,
 			PercentScoreWeightMiss=0,
 			PercentScoreWeightLetGo=0,
-			PercentScoreWeightHeld=IsGame("pump") and 0 or 3,
+			PercentScoreWeightHeld=3,
 			PercentScoreWeightHitMine=-1,
 			PercentScoreWeightCheckpointHit=0,
 
@@ -324,7 +362,7 @@ SL = {
 			GradeWeightW5=0,
 			GradeWeightMiss=0,
 			GradeWeightLetGo=0,
-			GradeWeightHeld=IsGame("pump") and 0 or 3,
+			GradeWeightHeld=3,
 			GradeWeightHitMine=-1,
 			GradeWeightCheckpointHit=0,
 
@@ -348,7 +386,7 @@ SL = {
 			PercentScoreWeightW5=-6,
 			PercentScoreWeightMiss=-12,
 			PercentScoreWeightLetGo=0,
-			PercentScoreWeightHeld=IsGame("pump") and 0 or 5,
+			PercentScoreWeightHeld=5,
 			PercentScoreWeightHitMine=-6,
 			PercentScoreWeightCheckpointHit=0,
 
@@ -359,7 +397,7 @@ SL = {
 			GradeWeightW5=-6,
 			GradeWeightMiss=-12,
 			GradeWeightLetGo=0,
-			GradeWeightHeld=IsGame("pump") and 0 or 5,
+			GradeWeightHeld=5,
 			GradeWeightHitMine=-6,
 			GradeWeightCheckpointHit=0,
 
@@ -369,8 +407,8 @@ SL = {
 			LifePercentChangeW4=0.000,
 			LifePercentChangeW5=-0.050,
 			LifePercentChangeMiss=-0.100,
-			LifePercentChangeLetGo=IsGame("pump") and 0.000 or -0.080,
-			LifePercentChangeHeld=IsGame("pump") and 0.000 or 0.008,
+			LifePercentChangeLetGo=-0.080,
+			LifePercentChangeHeld=0.008,
 			LifePercentChangeHitMine=-0.050,
 
 			InitialValue=0.5,
@@ -383,7 +421,7 @@ SL = {
 			PercentScoreWeightW5=0,
 			PercentScoreWeightMiss=-12,
 			PercentScoreWeightLetGo=0,
-			PercentScoreWeightHeld=IsGame("pump") and 0 or 5,
+			PercentScoreWeightHeld=5,
 			PercentScoreWeightHitMine=-6,
 			PercentScoreWeightCheckpointHit=0,
 
@@ -394,7 +432,7 @@ SL = {
 			GradeWeightW5=0,
 			GradeWeightMiss=-12,
 			GradeWeightLetGo=0,
-			GradeWeightHeld=IsGame("pump") and 0 or 5,
+			GradeWeightHeld=5,
 			GradeWeightHitMine=-6,
 			GradeWeightCheckpointHit=0,
 
@@ -404,8 +442,8 @@ SL = {
 			LifePercentChangeW4=0.004,
 			LifePercentChangeW5=0,
 			LifePercentChangeMiss=-0.1,
-			LifePercentChangeLetGo=IsGame("pump") and 0.000 or -0.080,
-			LifePercentChangeHeld=IsGame("pump") and 0.000 or 0.008,
+			LifePercentChangeLetGo=-0.080,
+			LifePercentChangeHeld=0.008,
 			LifePercentChangeHitMine=-0.05,
 
 			InitialValue=0.5,
@@ -476,7 +514,11 @@ SL = {
 	--              (either success or failure).
 	-- If a request fails, there will be another key:
 	--    ErrorMessage: string, the reasoning for the failure.
-	Downloads = {}
+	Downloads = {},
+
+	-- Latest versions available for ITGmania and Simply Love.
+	ITGmaniaLatestVersion = nil,
+	SimplyLoveLatestVersion = nil,
 }
 
 
