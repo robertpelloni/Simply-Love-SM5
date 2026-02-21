@@ -221,6 +221,15 @@ SL = {
 			color("#b45cff"),	-- purple (greatly lightened)
 			color("#ff3030")	-- red (slightly lightened)
 		},
+		DDR = {
+			color("#faf6d1"),	-- white
+			color("#e29c18"),	-- gold
+			color("#66c955"),	-- green
+			color("#21CCE8"),	-- blue
+			-- Colors below are basically unused.
+			color("#b45cff"),	-- purple (greatly lightened)
+			color("#ff3030")	-- red (slightly lightened)
+		},
 	},
 	Preferences = {
 		Casual = {
@@ -291,6 +300,28 @@ SL = {
 			-- it's as good as "fixed" for the very very large majority of
 			-- cases so we can set this back to 70ms now.
 			TimingWindowSecondsMine=0.070000,
+			TimingWindowSecondsRoll=0.350000,
+		},
+		DDR = {
+			TimingWindowAdd=0.0000,
+			RegenComboAfterMiss=0,
+			MaxRegenComboAfterMiss=0,
+			MinTNSToHideNotes="TapNoteScore_W4",
+			HarshHotLifePenalty=true,
+
+			PercentageScoring=true,
+			AllowW1="AllowW1_Everywhere",
+			SubSortByNumSteps=true,
+
+			TimingWindowSecondsW1=0.016667, -- Marv
+			TimingWindowSecondsW2=0.033333, -- Perf
+			TimingWindowSecondsW3=0.083333, -- Great
+			TimingWindowSecondsW4=0.123333, -- Good
+			TimingWindowSecondsW5=0.163333, -- "Almost"
+			-- NOTE(teejusb): Not quite sure. Just stick with ITG for now.
+			TimingWindowSecondsHold=0.320000,
+			-- NOTE(teejusb): I believe shock arrows are the same as greats?
+			TimingWindowSecondsMine=0.083333,
 			TimingWindowSecondsRoll=0.350000,
 		},
 	},

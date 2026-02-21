@@ -58,6 +58,36 @@ local TNSFrames = {
 	TapNoteScore_CheckpointMiss = 5
 }
 
+local JudgeCmds = {
+	TapNoteScore_W1 = THEME:GetMetric( "Judgment", "JudgmentW1Command" )
+	TapNoteScore_W2 = THEME:GetMetric( "Judgment", "JudgmentW2Command" )
+	TapNoteScore_W3 = THEME:GetMetric( "Judgment", "JudgmentW3Command" )
+	TapNoteScore_W4 = THEME:GetMetric( "Judgment", "JudgmentW4Command" )
+	TapNoteScore_W5 = THEME:GetMetric( "Judgment", "JudgmentW5Command" )
+	TapNoteScore_Miss = THEME:GetMetric( "Judgment", "JudgmentMissCommand" )
+}
+
+local ProtimingCmds = {
+	TapNoteScore_W1 = THEME:GetMetric( "Protiming", "ProtimingW1Command" )
+	TapNoteScore_W2 = THEME:GetMetric( "Protiming", "ProtimingW2Command" )
+	TapNoteScore_W3 = THEME:GetMetric( "Protiming", "ProtimingW3Command" )
+	TapNoteScore_W4 = THEME:GetMetric( "Protiming", "ProtimingW4Command" )
+	TapNoteScore_W5 = THEME:GetMetric( "Protiming", "ProtimingW5Command" )
+	TapNoteScore_Miss = THEME:GetMetric( "Protiming", "ProtimingMissCommand" )
+}
+
+show_fast_slow = false
+if SL.Global.GameMode == "DDR" then
+	show_fast_slow = true
+--	if ReadPrefFromFile("UserPrefGameplayShowFastSlow") ~= nil then
+--		if GetUserPrefB("UserPrefGameplayShowFastSlow") then
+--			show_fast_slow = true;
+--		else
+--			show_fast_slow = false;
+--		end
+--	end
+end
+
 return Def.ActorFrame{
 	Name="Player Judgment",
 	InitCommand=function(self)
@@ -216,6 +246,12 @@ return Def.ActorFrame{
 
 			else
 				self:Load( THEME:GetPathG("", "_judgments/" .. file_to_load) )
+			end
+
+			-- Adjust height if DDR mode
+			-- TODO(teejusb): what about reverse mode?
+			if SL.Global.GameMode == "DDR" then
+				self:y(-49)
 			end
 		end,
 		ResetCommand=function(self) self:finishtweening():stopeffect():visible(false) end

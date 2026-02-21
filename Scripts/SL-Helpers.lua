@@ -364,6 +364,7 @@ SetGameModePreferences = function()
 	prefix["ITG"] = ""
 
 	prefix["Casual"] = "Casual-"
+	prefix["DDR"] = "DDR-"
 
 	if PROFILEMAN:GetStatsPrefix() ~= prefix[SL.Global.GameMode] then
 		PROFILEMAN:SetStatsPrefix(prefix[SL.Global.GameMode])

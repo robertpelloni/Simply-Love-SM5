@@ -25,6 +25,7 @@ local styletype = ToEnumShortString(GAMESTATE:GetCurrentStyle():GetStyleType())
 
 -- scores are not aligned symmetrically around screen.cx for aesthetic reasons
 -- and this is the cause of many code-induced headaches
+local alpha = 0.0
 local pos = {
 	[PLAYER_1] = { x=(_screen.cx - clamp(_screen.w, 640, 854)/4.3),  y=56 },
 	[PLAYER_2] = { x=(_screen.cx + clamp(_screen.w, 640, 854)/2.75), y=56 },
@@ -52,7 +53,11 @@ local zoom_factor = clamp(scale(GetScreenAspectRatio(), 16/10, 16/9, ar_scale.si
 
 -- -----------------------------------------------------------------------
 
-return LoadFont("Wendy/_wendy monospace numbers")..{
+local af = Def.ActorFrame{}
+
+af[#af+1] = LoadActor("./ScoreBackground.lua", {alpha})
+
+af[#af+1] = LoadFont("Wendy/_wendy monospace numbers")..{
 	Text="0.00",
 	Name=pn.."Score",
 	InitCommand=function(self)
