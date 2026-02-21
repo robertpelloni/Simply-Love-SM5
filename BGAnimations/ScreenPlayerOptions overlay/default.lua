@@ -109,6 +109,7 @@ local t = Def.ActorFrame{
 		-- so ensure that this ActorFrame can be seen each time OnCommand() is called
 		self:diffusealpha(1)
 		self:queuecommand("Capture")
+		MESSAGEMAN:Broadcast("SongSelected")
 	end,
 	OffCommand=function(self) self:linear(0.2):diffusealpha(0) end,
 	CaptureCommand=function(self)
