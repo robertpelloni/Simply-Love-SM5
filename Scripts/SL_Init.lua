@@ -10,6 +10,7 @@ local PlayerDefaults = {
 				ComboFont = "Wendy",
 				HoldJudgment = "Love 1x2 (doubleres).png",
 				NoteSkin = nil,
+				NoteSkinVariant = nil,
 				Mini = "0%",
 				BackgroundFilter = "Darker",
 				VisualDelay = "0ms",
@@ -95,6 +96,7 @@ local PlayerDefaults = {
 			self.ITLData = {
 				["pathMap"] = {},
 				["hashMap"] = {},
+				["unlockFolders"] = {},
 			}
 
 			-- default panes to intialize ScreenEvaluation to
@@ -148,7 +150,11 @@ local GlobalDefaults = {
 			}
 			self.TimeAtSessionStart = nil
 			self.SampleMusicLoops = ThemePrefs.Get("SampleMusicLoops")
+			self.SampleMusicStartsImmediately = ThemePrefs.Get("SampleMusicStartsImmediately")
 
+			-- Is the music wheel locked? Useful when loading overlay screens
+			self.MusicWheelLocked = false
+			
 			self.GameplayReloadCheck = false
 			-- How long to wait before displaying a "cue"
 			self.ColumnCueMinTime = 1.5

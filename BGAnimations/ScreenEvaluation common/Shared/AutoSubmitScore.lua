@@ -93,6 +93,9 @@ local AttemptDownloads = function(res)
 	for i=1,2 do
 		local playerStr = "player"..i
 		local events = {"rpg", "itl"}
+		local player = "PlayerNumber_P"..i
+		local itlDownloadsFound = false
+
 
 		for event in ivalues(events) do
 			if data and data[playerStr] and data[playerStr][event] then
@@ -111,7 +114,6 @@ local AttemptDownloads = function(res)
 
 							if ThemePrefs.Get("SeparateUnlocksByPlayer") then
 								local profileName = "NoName"
-								local player = "PlayerNumber_P"..i
 								if (PROFILEMAN:IsPersistentProfile(player) and
 										PROFILEMAN:GetProfile(player)) then
 									profileName = PROFILEMAN:GetProfile(player):GetDisplayName()
@@ -230,6 +232,7 @@ local AutoSubmitRequestProcessor = function(res, overlay)
 					end
 
 					-- Only display the overlay on the sides that are actually joined.
+<<<<<<< HEAD
 					if ToEnumShortString("PLAYER_P"..i) == "P"..side then
 						if (data[playerStr]["rpg"] or data[playerStr]["itl"]) then
 							local eventAf = overlay:GetChild("AutoSubmitMaster"):GetChild("EventOverlay"):GetChild("P"..i.."EventAf")
@@ -249,6 +252,31 @@ local AutoSubmitRequestProcessor = function(res, overlay)
 							logo:visible(true)
 							tpxText:visible(true):settext("TPX: "..tpx)
 							lpxText:visible(true):settext("LPX: "..lpx)
+=======
+					if ToEnumShortString("PLAYER_P"..i) == "P"..side and (data[playerStr]["rpg"] or data[playerStr]["itl"]) then
+						local eventAf = overlay:GetChild("AutoSubmitMaster"):GetChild("EventOverlay"):GetChild("P"..i.."EventAf")
+						eventAf:playcommand("Show", {data=data[playerStr]})
+						shouldDisplayOverlay = true
+
+						if data[playerStr]["itl"] then
+							-- Check for downloadFolders
+							local itlData = data[playerStr]["itl"]
+							if itlData["progress"] and itlData["progress"]["questsCompleted"] then
+								local quests = itlData["progress"]["questsCompleted"]
+								local hasDownloadFolders = false
+								for quest in ivalues(quests) do
+									if quest["songDownloadFolders"] then
+										local downloadFolders = quest["songDownloadFolders"]
+										UpdateItlUnlocks("PlayerNumber_P"..side, downloadFolders)
+										hasDownloadFolders = true
+									end
+								end
+								if hasDownloadFolders then
+									-- Write out the file if we found any download unlocks.
+									WriteItlFile("PlayerNumber_P"..side)
+								end
+							end
+>>>>>>> upstream/itgmania-release
 						end
 					end
 
@@ -415,7 +443,7 @@ local af = Def.ActorFrame {
 				self:GetParent():GetChild("P2SubmitText"):settext(THEME:GetString("GrooveStats", "Submitting"))
 					
 				self:playcommand("MakeGrooveStatsRequest", {
-					endpoint="score-submit.php?"..NETWORK:EncodeQueryParameters(query),
+					endpoint="?action=scoreSubmit&"..NETWORK:EncodeQueryParameters(query),
 					method="POST",
 					headers=headers,
 					body=JsonEncode(body),
